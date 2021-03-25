@@ -1,0 +1,5 @@
+.ionide
+.vs
+src/**/bin
+src/**/obj
+*.user
