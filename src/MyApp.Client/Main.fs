@@ -135,7 +135,7 @@ let initModel =
     {
         greeting = "Allo ales"
         dg={
-            Title = "Table caption"
+            Title = "Table caption gaga"
             TitleEditing=false
             Columns = RowModel.New 
                         [|  "Nr."
@@ -163,17 +163,35 @@ let view (model:Model) dispatch =
     concat [
         h1 [] [text model.greeting]
         DataGrid.view model.dg dispatch
-        //let layout = 
-        //    new Layout(
-        //        Title= Title(Text="Scatter"),
-        //        YAxis= ResizeArray<YAxis> ([
-        //            YAxis(Title= YAxisLib.Title(Text="Scatter Unit"))
-        //        ])
-        //    )
-        //in
         ecomp<Plotly.Chart,_,_> [
-            //attr.style "background-color:yellow"
-        ] "123" (fun x->())
+            "DivStyle" => "width:600px;height:500px;"
+        ] {
+            Data= [|
+                {|
+                    Type = "scatter"
+                    x = [|0; 1; 2; 3; 4; 5|]
+                    y =  [|1.5; 1.0; 1.3; 0.7; 0.8; 0.9|]
+                |}
+                {|
+                    Type = "bar"
+                    x = [|0; 1; 2; 3; 4; 5|]
+                    y = [|1.0; 0.5; 0.7; -1.2; 0.3; 0.4|]
+                |}
+            |]
+            Layout={| 
+                    title = "Qofte"
+                    polar = 
+                     {|
+                          radialaxis= 
+                          {|
+                              visible= true
+                              range= [|0; 50|]
+                          |}
+                     |}
+                    //showlegend= false
+            |}
+          } 
+          (fun x->())
         
         //    "layout" => layout 
         //    attr.style "height: 60vh; width=600px; min-height: 350px"
