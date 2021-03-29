@@ -25,18 +25,8 @@
         </div>
     </nav>
     <div id="main">Loading...</div>
-    <script type="text/javascript">
-        window.MyJsLib = {
-            focus: function (elt) {
-                console.log("try focus ", elt)
-                elt.focus();
-            }
-        };
-    </script>
-    <!-- Import the plotly.js library -->
-    <script src="_content/Plotly.Blazor/plotly-latest.min.js" type="text/javascript"></script>
-    <!-- Import the plotly.js interop functions -->
-    <script src="_content/Plotly.Blazor/plotly-interop.js" type="text/javascript"></script>
+    <script src="plotly.min.js" type="text/javascript"></script>
+    <script src="my_interop.js" type="text/javascript"></script>
     <script src="_framework/blazor.webassembly.js"></script>
 </body>
 </html>

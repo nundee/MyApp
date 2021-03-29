@@ -3,23 +3,8 @@ module MyApp.Client.Main
 open Elmish
 open Bolero
 open Bolero.Html
-open Plotly.Blazor
-open Plotly.Blazor.LayoutLib
-open Plotly.Blazor.Traces.ScatterLib
 
-open Microsoft.JSInterop
-
-type JS() =    
-    static member val Runtime = Unchecked.defaultof<IJSRuntime>  with get, set
-    static member log([<System.ParamArray>] args:obj[]) =
-        JS.Runtime.InvokeVoidAsync("console.log",args) |> ignore
-    static member exec(func:string, [<System.ParamArray>] args:obj[])=
-        JS.Runtime.InvokeVoidAsync(func, args) |> ignore
-    static member eval(func:string, [<System.ParamArray>] args:obj[])=
-        let task=JS.Runtime.InvokeAsync(func, args).AsTask()
-        task.RunSynchronously()
-        task.Result
-
+//open MyInterop
 
 module DataGrid =
     type RowModel = {
@@ -55,6 +40,7 @@ module DataGrid =
     type MyInput()=
         inherit ElmishComponent<string,string>()
         let inputRef = HtmlRef()
+        let mutable value = ""
         let mutable changed=false
 
         //override this.ShouldRender(oldModel, newModel) =
@@ -64,12 +50,16 @@ module DataGrid =
             input [
                 attr.value model
                 attr.ref inputRef
-                bind.change.string model (fun t-> changed <- true; dispatch t)
-                on.focusout (fun _ -> if (not changed) then dispatch model)
+                bind.change.string model (fun t-> changed <- true; value <- t; MyInterop.unsetFocus(inputRef) |> ignore)//dispatch t)
+                on.blur (fun _ -> 
+                    //printfn "on.blur"
+                    dispatch (if changed then value else model)
+                ) 
             ]
         override this.OnAfterRenderAsync(firstRender:bool)=
-            JS.exec("MyJsLib.focus",inputRef.Value)
-            base.OnAfterRenderAsync(firstRender)
+            base.OnAfterRenderAsync(firstRender).ContinueWith(
+                fun _ -> MyInterop.setFocus inputRef |> ignore
+            )
 
     let rnd=System.Random()
 
@@ -90,7 +80,6 @@ module DataGrid =
                                 //JS.log("dblclick",i)
                                 printfn "dblclick %d" i
                                 let m=model.setEditingIndex(i)
-                                JS.log(m) |> ignore
                                 dispatch m
                         )
                     ] [
@@ -98,7 +87,6 @@ module DataGrid =
                         | true ->  ecomp<MyInput,_,_> [] 
                                     model.Cells.[i] (fun s -> 
                                         let m=model.setCell(i,s)
-                                        JS.log("done editing",m)
                                         dispatch m
                                     )
                         | false -> text model.Cells.[i]
@@ -175,20 +163,23 @@ let view (model:Model) dispatch =
     concat [
         h1 [] [text model.greeting]
         DataGrid.view model.dg dispatch
-        let layout = 
-            new Layout(
-                Title= Title(Text="Scatter"),
-                YAxis= ResizeArray<YAxis> ([
-                    YAxis(Title= YAxisLib.Title(Text="Scatter Unit"))
-                ])
-            )
-        in
-        comp<PlotlyChart> [
-            "layout" => layout 
-            attr.style "height: 60vh; width=600px; min-height: 350px"
+        //let layout = 
+        //    new Layout(
+        //        Title= Title(Text="Scatter"),
+        //        YAxis= ResizeArray<YAxis> ([
+        //            YAxis(Title= YAxisLib.Title(Text="Scatter Unit"))
+        //        ])
+        //    )
+        //in
+        ecomp<Plotly.Chart,_,_> [
+            //attr.style "background-color:yellow"
+        ] "123" (fun x->())
+        
+        //    "layout" => layout 
+        //    attr.style "height: 60vh; width=600px; min-height: 350px"
             
-        ] [
-        ]
+        //] [
+        //]
     ]
 
 
@@ -196,5 +187,5 @@ type MyApp() =
     inherit ProgramComponent<Model, DataGrid.Message>()
 
     override this.Program =
-        JS.Runtime <- this.JSRuntime
+        MyInterop.JS.Runtime <- this.JSRuntime
         Program.mkSimple (fun _ -> initModel) update view
