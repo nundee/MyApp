@@ -5,6 +5,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="my_interop.fs" />
+    <Compile Include="DataGrid.fs" />
     <Compile Include="plotly.fs" />
     <Compile Include="Main.fs" />
     <Compile Include="Startup.fs" />
