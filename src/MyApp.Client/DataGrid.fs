@@ -71,17 +71,19 @@ type Row()=
 
     override this.View model dispatch =
         //JS.log("render row", model)
-        tr [attr.style <| sprintf "background-color:#77%06x" (rnd.Next(0xFFFFFE))] [                
+        tr [attr.style <| sprintf "background-color:#77%06x" (rnd.Next(0xFFFFFE))] [
             forEach [|0..model.Cells.Length-1|] <| fun i -> 
                 td [
-                    if i=model.CellEditingIndex then attr.contenteditable true else                       
-                    on.dblclick (fun _-> 
-                        if i <> model.CellEditingIndex then 
-                            //JS.log("dblclick",i)
-                            printfn "dblclick %d" i
-                            let m=model.setEditingIndex(i)
-                            dispatch m
-                    )
+                    attr.contenteditable (i=model.CellEditingIndex)
+                    if i<>model.CellEditingIndex then 
+                        on.dblclick (fun _-> 
+                            if i <> model.CellEditingIndex then 
+                                //JS.log("dblclick",i)
+                                printfn "dblclick %d" i
+                                let m=model.setEditingIndex(i)
+                                dispatch m
+                        )
+                    else on.dblclick Unchecked.defaultof<_> //(fun _ -> ())
                 ] [
                     text model.Cells.[i]
                     // cond (i=model.CellEditingIndex) <| function
