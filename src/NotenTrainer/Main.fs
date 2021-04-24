@@ -52,7 +52,6 @@ let view (model:Model) dispatch =
             svg [
                 attr.height model.H
                 attr.width model.W
-                attr.bgcolor "tomato"
             ] [
                 elt "image" [
                     attr.id "violin"
