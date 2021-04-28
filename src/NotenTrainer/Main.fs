@@ -24,7 +24,7 @@ let initModel =
         H = 300.
         X0 = 10.
         Y0 = 70.
-        Current = [| 2,0; 3,0; 6,0 |]//array.Empty<_>()
+        Current = [| 0,-1; 3,0; 0,2 |]//array.Empty<_>()
         Guess = array.Empty<int>()
         NIter = 10
         Iter  = 1
@@ -51,10 +51,13 @@ let yc (m:Model) (i:float) =
     m.Y0 + i*gap
 
 
-let nodeCoord_Oct0 = [
-    5.; 4.5; 4.; 3.5; 3.; 2.5; 2. 
-]
+// let node_y_oct0 = [
+//     5.; 4.5; 4.; 3.5; 3.; 2.5; 2. 
+// ]
 
+let node_iy (inote:int) (ioctave:int)=
+    let i = inote + ioctave*7 |> float
+    5.0 - i/2.0
 
 let yi (m:Model) (i:int) = yc m (float i)
 
@@ -66,7 +69,8 @@ let inline hline (x:float) (y:float) len =
     elt "line" ["x1" => x; "y1" => y; "x2" => x+len; "y2" => y; "stroke" => "black"; "stroke-width" => 2] []
 
 let drawNote (model:Model) (nx:float) (nw:float) (nh:float) (inote:int) (ioctave:int) =
-    let y = yc model nodeCoord_Oct0.[inote]
+    let iy = node_iy inote ioctave
+    let y = yc model iy
     elt "g" [] [
         elt "ellipse" [
             "cx"=> nx
@@ -86,9 +90,26 @@ let drawNote (model:Model) (nx:float) (nw:float) (nh:float) (inote:int) (ioctave
             "stroke" => "black"
             "stroke-width" => 2
         ][]
-        cond (inote % 2 = 0) <| function
+        cond (abs (iy - (round iy)) < 0.1) <| function
         | true -> hline (nx-nh) y (2.0*nh)
         | false -> empty
+
+        if iy >= 5.0 then
+            let mutable yy = floor iy
+            concat [
+                while yy >= 5.0 do
+                    yield hline (nx-nw-3.0) (yc model yy) (2.0*nw+6.0)
+                    yy <- yy-1.0
+            ]
+        elif iy <= -1.0 then
+            let mutable yy = ceil iy
+            concat [
+                while yy <= -1.0 do
+                    yield hline (nx-nw-3.0) (yc model yy) (2.0*nw+6.0)
+                    yy <- yy+1.0
+            ]
+        else empty
+
     ] 
 
 let view (model:Model) dispatch =
