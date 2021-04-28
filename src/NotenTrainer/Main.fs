@@ -94,6 +94,54 @@ let drawNote (model:Model) (nx:float) (nw:float) (nh:float) (inote:int) (ioctave
 let view (model:Model) dispatch =
     let vh,vw = model.H/2.0*0.9, model.H/3.0*0.9
     let yim = yi model
+    let KW = int model.W
+    let KH_w = 120
+    let KW_w = min 45 (KW / 7)
+    let KH_b = 80
+    let KW_b = 20
+
+    let style1 = sprintf @"cursor: default;
+    font-size: 0px; height: %dpx;
+    padding: 0px;
+    position: relative;
+    list-style: none;
+    margin: 0px;
+    width: %dpx;
+    user-select: none;" KH_w KW
+
+    let style_w is_last =  
+        let right_border_width = if is_last then 1 else 0
+        let right_border_style = if is_last then "solid" else "initial"
+        let right_border_color = if is_last then "rgb(0, 0, 0)" else "initial"
+        $@"display: inline-block;
+        cursor:pointer; 
+        user-select: none; 
+        background-color: rgb(255, 255, 255); 
+        border-width: 1px {right_border_width}px 1px 1px; 
+        border-top-style: solid;
+        border-right-style: {right_border_style}; 
+        border-bottom-style: solid; 
+        border-left-style: solid; 
+        border-top-color: rgb(0, 0, 0); 
+        border-right-color: {right_border_color}; 
+        border-bottom-color: rgb(0, 0, 0); 
+        border-left-color: rgb(0, 0, 0); 
+        border-image: initial; 
+        height: {KH_w}px; 
+        width: {KW_w}px; 
+        border-radius: 0px 0px 5px 5px;" 
+
+    let style_b (left_pos:int) = 
+        $@"display: inline-block; 
+        user-select: none; 
+        background-color: rgb(0, 0, 0); 
+        border: 1px solid rgb(0, 0, 0); 
+        position: absolute; 
+        left: {left_pos}px; 
+        width: {KW_b}px; 
+        height: {KH_b}px; 
+        border-radius: 0px 0px 3px 3px;"
+
     concat [
         h1 [] [text "Notentrainer"]
         div [] [
@@ -111,51 +159,37 @@ let view (model:Model) dispatch =
                 forEach [0..4] <| fun i ->
                     hline model.X0 (yi model i) (model.W-2.0*model.X0)
                 
-                let x0,y0, rw, rh  = model.X0+20. , yim 8, 45.0, 60.0
-                forEach [0..6] <| fun i->
-                    elt "rect" [
-                        "x"=> x0 + (float i)*rw
-                        "y"=> y0
-                        "rx" => 3
-                        "ry" => 3
-                        "width" => rw
-                        "height" => rh
-                        "fill" => "white"
-                        "stroke" => "black"
-                        "stroke-width" => 1
-                        attr.style "cursor:pointer"
-                        on.click (fun _ -> printfn "clicked %d" i)
-                    ][]
-                forEach [0..6] <| fun i->
-                    elt "text" [
-                        "x"=> x0 + (float i)*rw + rw/2.0
-                        "y"=> y0 + rh/2.0
-                        "fill" => "black"
-                        "text-anchor" => "middle" 
-                        "alignment-baseline" => "central"
-                        "font-family" => "Courier-New"
-                        "font-size" => 12
-                        attr.style "cursor:pointer"
-                    ][ text noteNames.[i]]
-                let brw, brh = 16.0, 30 in
-                forEach [1;2;4;5;6] <| fun i->
-                    elt "rect" [
-                        "x"=> x0 + (i |> float)*rw - (brw/2.0)
-                        "y"=> y0
-                        "rx" => 3
-                        "ry" => 3
-                        "width" => brw
-                        "height" => brh
-                        "fill" => "black"
-                        "stroke" => "none"
-                    ][]
-
                 // draw note
                 let nx, nh = model.X0 + model.W/2.0-20.0, (yim 1 - yim 0)*0.4
                 let nw = nh*1.5
                 forEach [0..model.Current.Length-1] <| fun k ->
                     let i,j = model.Current.[k]
                     drawNote model (nx+(float k)*nw*2.0) nw nh i j
+            ]
+        ]
+        div[ 
+            attr.id "keyboard" 
+            attr.style style1 
+        ] [
+            ul [
+                attr.style style1
+            ] [
+                forEach noteNames_german <| fun c ->
+                    li [
+                        attr.id c 
+                        attr.title c 
+                        "data-note-type" => "white" 
+                        attr.style <| style_w (c="H")
+                        on.click (fun _ -> printfn "clicked %s" c)
+                    ] []
+                    
+                forEach [("C#",1);("D#",2); ("F#",4); ("G#",5); ("A#",6)] <| fun (c, i) ->
+                    li [
+                        attr.id c 
+                        attr.title c 
+                        "data-note-type" => "black" 
+                        attr.style <| style_b ((KW_w+1)*i - KW_b/2)
+                    ] []
             ]
         ]
     ]
