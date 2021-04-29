@@ -1,5 +1,6 @@
 module NotenTrainer.Main
 
+open System
 open Elmish
 open Bolero
 open Bolero.Html
@@ -11,36 +12,91 @@ type Model =
         H:  float
         X0: float
         Y0: float
+        MaxIter : int
+
+        StartTime : DateTime
         Current : (int*int)[]
-        Guess :   int[]
-        NIter : int
+        Guess :   int list
         Iter  : int
+        NrCorrect : int
+        LastGuess : bool
     }
 
+type Message =
+| NewGame
+| NextTest
+| NextGuess of note:string
 
-let initModel =
+let RND = System.Random()
+let inline nextRnd lb ub = RND.Next(lb,ub)
+let inline nextRandomNote () = (nextRnd 0 6), (nextRnd -1 2)
+
+type Settings = {
+    NrNotes:int
+    MaxIter:int
+}
+
+let settings = {
+    NrNotes = 2
+    MaxIter = 10
+}
+
+let initModel () =
+    let now = DateTime.Now
     {
         W = 400.
         H = 300.
         X0 = 10.
         Y0 = 70.
-        Current = [| 0,-1; 3,0; 0,2 |]//array.Empty<_>()
-        Guess = array.Empty<int>()
-        NIter = 10
-        Iter  = 1
+
+        StartTime = now
+        Current = Array.init settings.NrNotes <| fun _ -> nextRandomNote()
+        Guess = []
+        MaxIter = settings.MaxIter
+        Iter  = 0
+        NrCorrect = 0
+        LastGuess = false
     }
 
-let noteNames_english = [|
-    "C"; "D"; "E"; "F"; "G"; "A"; "B"
-|]
+let checkGuess model =
+    let guess = model.Guess |> List.rev |> List.toArray
+    let test = model.Current |> Array.map fst
+    let lastGuess = (guess=test)
+    { model with
+        Iter = model.Iter+1
+        NrCorrect = model.NrCorrect + (if lastGuess then 1 else 0)
+        LastGuess = lastGuess
+    }
 
 let noteNames_german = [|
     "C"; "D"; "E"; "F"; "G"; "A"; "H"
 |]
+let noteNames_english = [|
+    "C"; "D"; "E"; "F"; "G"; "A"; "B"
+|]
+
 
 let noteNames_italian = [|
     "Do"; "Re"; "Mi"; "Fa"; "Sol"; "La"; "Si"
 |]
+
+
+let rec update (message:Message) (model:Model) =
+    match message with
+    | NewGame -> initModel()
+    | NextTest -> 
+        {model with 
+            Current = Array.init settings.NrNotes <| fun _ -> nextRandomNote()
+            Guess = []
+        }
+    | NextGuess(c) ->
+        let i = noteNames_german |> Array.findIndex ((=) c)
+        let newModel = { model with Guess = i::model.Guess }
+        if newModel.Guess.Length = newModel.Current.Length then
+            checkGuess newModel |> update NextTest
+        else newModel
+
+
 
 
 let noteNames = noteNames_german
@@ -61,11 +117,9 @@ let node_iy (inote:int) (ioctave:int)=
 
 let yi (m:Model) (i:int) = yc m (float i)
 
-let update message model = 
-    model
 
 
-let inline hline (x:float) (y:float) len = 
+let inline hline (x:float) (y:float) len =
     elt "line" ["x1" => x; "y1" => y; "x2" => x+len; "y2" => y; "stroke" => "black"; "stroke-width" => 2] []
 
 let drawNote (model:Model) (nx:float) (nw:float) (nh:float) (inote:int) (ioctave:int) =
@@ -201,7 +255,7 @@ let view (model:Model) dispatch =
                         attr.title c 
                         "data-note-type" => "white" 
                         attr.style <| style_w (c="H")
-                        on.click (fun _ -> printfn "clicked %s" c)
+                        on.click (fun _ -> NextGuess(c) |> dispatch)
                     ] []
                     
                 forEach [("C#",1);("D#",2); ("F#",4); ("G#",5); ("A#",6)] <| fun (c, i) ->
@@ -213,12 +267,35 @@ let view (model:Model) dispatch =
                     ] []
             ]
         ]
+        p [] [
+            ul [
+                attr.style @"
+                    list-style: none;
+                    font-size: medium;
+                    font-family: cursive;"
+            ] [ 
+                let first_item = li [] [text $"left {model.MaxIter - model.Iter}"]
+                cond (model.Iter>0) <| function
+                | false -> first_item
+                | true -> 
+                    concat [
+                        li [] [text $"elapsed time: {(DateTime.Now-model.StartTime).Seconds} seconds"]
+                        first_item
+                        li [] [text $"correct {System.Math.Round((float model.NrCorrect)/(float model.Iter)*100.0,1)} %%"]
+                        li [ attr.style (if model.LastGuess then "color:green;" else "color:red;")] [
+                                text <| sprintf "last guess was %s" (if model.LastGuess then "correct" else "wrong")
+                           ]
+                    ]
+            ]
+        ]
     ]
 
 
 type MyApp() =
-    inherit ProgramComponent<Model, string>()
+    inherit ProgramComponent<Model, Message>()
 
     override this.Program =
         MyInterop.JS.Runtime <- this.JSRuntime
-        Program.mkSimple (fun _ -> initModel) update view
+        Program.mkSimple (fun _ -> initModel ()) update view
+        |> Program.withConsoleTrace
+        |> Program.withErrorHandler (fun (msg, exn) -> printfn "%A: %A" msg exn)
