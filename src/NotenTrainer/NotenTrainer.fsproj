@@ -4,6 +4,10 @@
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
+    <Compile Include="Model.fs" />
+    <Compile Include="Partitur.fs" />
+    <Compile Include="Keyboard.fs" />
+    <Compile Include="Stats.fs" />
     <Compile Include="my_interop.fs" />
     <Compile Include="Main.fs" />
     <Compile Include="Startup.fs" />
