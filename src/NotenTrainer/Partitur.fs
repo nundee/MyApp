@@ -11,20 +11,24 @@ let yc (m:Model) (i:float) =
     m.Y0 + i*gap
 
 
-let node_iy (inote:int) (ioctave:int)=
+let node_iy (inote:int) (ioctave:int) off =
     let i = inote + ioctave*7 |> float
-    5.0 - i/2.0
+    off - i/2.0
 
 let yi (m:Model) (i:int) = yc m (float i)
-
 
 
 let inline hline (x:float) (y:float) len =
     elt "line" ["x1" => x; "y1" => y; "x2" => x+len; "y2" => y; "stroke" => "black"; "stroke-width" => 2] []
 
 let drawNote (model:Model) (nx:float) (nw:float) (nh:float) (inote:int) (ioctave:int) =
-    let iy = node_iy inote ioctave
-    let y = yc model iy
+    let offset = 
+        match model.CurrentKey with 
+        | EKey.Violin -> 5.0
+        | _ -> 2.5
+
+    let iy = node_iy inote ioctave offset
+    let y = yc model iy 
     elt "g" [] [
         elt "ellipse" [
             "cx"=> nx
@@ -79,7 +83,7 @@ type Partitur()=
             ] [
                 elt "image" [
                     attr.id "violin"
-                    attr.href "violin.svg" 
+                    attr.href <| match model.CurrentKey with EKey.Violin -> "violin.svg" | _ -> "bass.svg"
                     "x"=> model.X0+10.; "y" => model.Y0 + ((yim 4) - (yim 0) - vh)/2.0
                     attr.height vh
                     attr.width  vw

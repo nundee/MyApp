@@ -2,6 +2,9 @@ module NotenTrainer.Model
 
 open System
 
+type EKey=
+    | Violin = 0
+    | Bass   = 1
 type Model =
     {
         W:  float
@@ -11,6 +14,7 @@ type Model =
         MaxIter : int
 
         StartTime : DateTime
+        CurrentKey : EKey
         Current : (int*int)[]
         Guess :   int list
         Iter  : int
@@ -19,13 +23,18 @@ type Model =
     }
 
 type Message =
-| NewGame
-| NextTest
-| NextGuess of note:string
+    | NewGame
+    | NextTest
+    | NextGuess of note:string
 
 let RND = Random()
 let inline nextRnd lb ub = RND.Next(lb,ub)
-let inline nextRandomNote () = (nextRnd 0 6), (nextRnd -1 2)
+let inline nextRandomNote () = (nextRnd 0 7), (nextRnd -1 2)
+let inline nextNotes n = 
+    Array.init (2*n) <| fun _ -> nextRandomNote()
+    |> Array.distinct
+    |> Array.take n
+let inline nextKey () = nextRnd 0 2 |> enum<EKey>
 
 type Settings = {
     NrNotes:int
@@ -48,7 +57,8 @@ let initModel () =
         Y0 = 70.
 
         StartTime = now
-        Current = Array.init settings.NrNotes <| fun _ -> nextRandomNote()
+        CurrentKey = nextKey()
+        Current = nextNotes settings.NrNotes
         Guess = []
         MaxIter = settings.MaxIter
         Iter  = 0
@@ -84,7 +94,8 @@ let rec update (message:Message) (model:Model) =
     | NewGame -> initModel()
     | NextTest -> 
         {model with 
-            Current = Array.init settings.NrNotes <| fun _ -> nextRandomNote()
+            CurrentKey = nextKey()
+            Current = nextNotes settings.NrNotes
             Guess = []
         }
     | NextGuess(c) ->
