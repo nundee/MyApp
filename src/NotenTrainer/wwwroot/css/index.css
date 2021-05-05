@@ -18,21 +18,15 @@ body {
 
 
 /* Style buttons */
-
 .btn {
-    background-color: lightgrey;
-    /* Blue background */
+    background-color: transparent;
     border: none;
-    /* Remove borders */
-    padding: 0px 0px;
-    /* Some padding */
+    padding: 2px 2px;
     cursor: pointer;
-    /* Mouse pointer on hover */
 }
-
 
 /* Darker background on mouse-over */
 
 .btn:hover {
-    background-color: grey;
+    background-color: lightgrey;
 }

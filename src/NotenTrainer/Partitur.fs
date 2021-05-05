@@ -76,7 +76,7 @@ type Partitur()=
     override _.View model dispatch =
         let vh,vw = model.H/2.0*0.9, model.H/3.0*0.9
         let yim = yi model
-        div [] [
+        div [attr.style (if gameOver model then "background: radial-gradient(black, transparent);" else null)] [
             svg [
                 attr.height model.H
                 attr.width model.W
