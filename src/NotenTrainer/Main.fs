@@ -13,6 +13,10 @@ open NotenTrainer.Stats
 
 let view (model:Model) dispatch =
     concat [
+        div [] [
+            button ["class"=>"btn"] [img [attr.src "reload_icon.png"; attr.width "32px"; attr.height "32px"]]
+            button ["class"=>"btn"] [text "bla"]
+        ]
         h1 [] [text "Notentrainer"]
         ecomp<Partitur,_,_> [] model <| dispatch
         ecomp<Keyboard,_,_> [] model <| dispatch 

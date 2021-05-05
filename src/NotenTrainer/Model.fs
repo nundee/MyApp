@@ -76,6 +76,9 @@ let checkGuess model =
         LastGuess = lastGuess
     }
 
+let gameOver model=
+    model.Iter>=model.MaxIter
+
 let noteNames_german = [|
     "C"; "D"; "E"; "F"; "G"; "A"; "H"
 |]
