@@ -5,6 +5,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Compile Include="Model.fs" />
+    <Compile Include="Language.fs" />
     <Compile Include="Partitur.fs" />
     <Compile Include="Keyboard.fs" />
     <Compile Include="Stats.fs" />

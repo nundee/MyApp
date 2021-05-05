@@ -20,8 +20,12 @@ let view (model:Model) dispatch =
     ]
     concat [
         div [attr.style "display: flex; justify-content: flex-end; margin-right: 20px;"] [
-            button ["class"=>"btn"; attr.style "margin-right: 20px;"] [
-                img [attr.src "reload_icon.png"; attr.width "32px"; attr.height "32px"]
+            button [
+                "class"=>"btn"; 
+                attr.style "margin-right: 20px;"
+                on.click (fun _ -> dispatch NewGame)
+            ] [
+                img [attr.src "reload_icon.png"; attr.width "32px"; attr.height "32px"]                
             ]
             forEach flags <| fun (f,t)->
                 button ["class"=>"btn"; attr.title t] [img [attr.src f; attr.width "32px"; attr.height "32px"]]

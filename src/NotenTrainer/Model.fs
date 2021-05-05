@@ -12,6 +12,7 @@ type Model =
         X0: float
         Y0: float
         MaxIter : int
+        Language : string
 
         StartTime : DateTime
         CurrentKey : EKey
@@ -26,6 +27,7 @@ type Message =
     | NewGame
     | NextTest
     | NextGuess of note:string
+    | ChangeLanguage of string
 
 let RND = Random()
 let inline nextRnd lb ub = RND.Next(lb,ub)
@@ -45,7 +47,7 @@ type Settings = {
 let settings = {
     NrNotes = 2
     MaxIter = 10
-    Language = "de"
+    Language = "deutsch"
 }
 
 let initModel () =
@@ -55,6 +57,7 @@ let initModel () =
         H = 300.
         X0 = 10.
         Y0 = 70.
+        Language = settings.Language
 
         StartTime = now
         CurrentKey = nextKey()
@@ -79,17 +82,6 @@ let checkGuess model =
 let gameOver model=
     model.Iter>=model.MaxIter
 
-let noteNames_german = [|
-    "C"; "D"; "E"; "F"; "G"; "A"; "H"
-|]
-let noteNames_english = [|
-    "C"; "D"; "E"; "F"; "G"; "A"; "B"
-|]
-
-
-let noteNames_italian = [|
-    "Do"; "Re"; "Mi"; "Fa"; "Sol"; "La"; "Si"
-|]
 
 
 let rec update (message:Message) (model:Model) =
@@ -102,11 +94,12 @@ let rec update (message:Message) (model:Model) =
             Guess = []
         }
     | NextGuess(c) ->
+        if gameOver model then model else
         let i = noteNames_german |> Array.findIndex ((=) c)
         let newModel = { model with Guess = i::model.Guess }
         if newModel.Guess.Length = newModel.Current.Length then
             checkGuess newModel |> update NextTest
         else newModel
-
+    | ChangeLanguage(lang) -> {model with Language=lang}
 
 let noteNames = noteNames_german
