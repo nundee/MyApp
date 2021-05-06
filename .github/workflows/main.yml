@@ -16,7 +16,7 @@ on:
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
   # Build the project
-  build:
+  build-and-deploy-notentrainer:
     # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
@@ -35,6 +35,13 @@ jobs:
       - name: Publish the project
         run: dotnet publish src/NotenTrainer/NotenTrainer.fsproj -c Release -o release/NotenTrainer --nologo
 
+      # changes the base-tag in index.html from '/' to 'MyApp' to match GitHub Pages repository subdirectory
+      - name: Change base-tag in index.html from / to MyApp
+        run: sed -i 's/<base href="\/" \/>/<base href="\/MyApp\/" \/>/g' release/NotenTrainer/wwwroot/index.html
+      # add .nojekyll file to tell GitHub pages to not treat this as a Jekyll project. (Allow files and folders starting with an underscore)
+      - name: Add .nojekyll file
+        run: touch release/NotenTrainer/wwwroot/.nojekyll
+
       - name: Commit wwwroot to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@3.7.1
         with:
@@ -42,9 +49,3 @@ jobs:
             BRANCH: gh-pages
             FOLDER: release/NotenTrainer/wwwroot
 
-      # changes the base-tag in index.html from '/' to 'MyApp' to match GitHub Pages repository subdirectory
-      - name: Change base-tag in index.html from / to MyApp
-        run: sed -i 's/<base href="\/" \/>/<base href="\/MyApp\/" \/>/g' release/NotenTrainer/wwwroot/index.html
-      # add .nojekyll file to tell GitHub pages to not treat this as a Jekyll project. (Allow files and folders starting with an underscore)
-      - name: Add .nojekyll file
-        run: touch release/NotenTrainer/wwwroot/.nojekyll
