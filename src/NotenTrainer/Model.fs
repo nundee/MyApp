@@ -1,6 +1,7 @@
 module NotenTrainer.Model
 
 open System
+open MyInterop
 
 type EKey=
     | Violin = 0
@@ -44,11 +45,18 @@ type Settings = {
     Language : string
 }
 
-let settings = {
+let defaultSettings = {
     NrNotes = 2
     MaxIter = 10
-    Language = "deutsch"
+    Language = "englisch"
 }
+
+let mutable settings = {defaultSettings with Language=null}
+let inline settingsLoaded () = settings.Language <> null 
+
+let changeSettings newSettings =
+    settings <- newSettings
+    saveSettings settings |> ignore
 
 let initModel () =
     let now = DateTime.Now
@@ -56,7 +64,7 @@ let initModel () =
         W = 400.
         H = 300.
         X0 = 10.
-        Y0 = 70.
+        Y0 = 90.
         Language = settings.Language
 
         StartTime = now
@@ -79,10 +87,13 @@ let checkGuess model =
         LastGuess = lastGuess
     }
 
-let gameOver model=
+let inline gameOver model = 
     model.Iter>=model.MaxIter
 
+let inline guessCompleted model = 
+    model.Guess.Length = model.Current.Length
 
+open NotenTrainer.Lang
 
 let rec update (message:Message) (model:Model) =
     match message with
@@ -95,11 +106,11 @@ let rec update (message:Message) (model:Model) =
         }
     | NextGuess(c) ->
         if gameOver model then model else
-        let i = noteNames_german |> Array.findIndex ((=) c)
+        let i = getNoteNames model.Language |> Array.findIndex ((=) c)
         let newModel = { model with Guess = i::model.Guess }
-        if newModel.Guess.Length = newModel.Current.Length then
-            checkGuess newModel |> update NextTest
+        if newModel |> guessCompleted then newModel |> checkGuess |> update NextTest
         else newModel
-    | ChangeLanguage(lang) -> {model with Language=lang}
+    | ChangeLanguage(lang) -> 
+        changeSettings {settings with Language=lang}
+        {model with Language=lang}
 
-let noteNames = noteNames_german

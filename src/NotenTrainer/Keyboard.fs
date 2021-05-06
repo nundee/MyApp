@@ -4,13 +4,15 @@ open Bolero
 open Bolero.Html
 
 open NotenTrainer.Model
+open NotenTrainer.Lang
 
 type Keyboard()=
     inherit ElmishComponent<Model,Message>()
 
     override _.ShouldRender(oldModel, newModel) =
-        oldModel.W <> newModel.W
-       
+        oldModel.W <> newModel.W ||
+        oldModel.Language <> newModel.Language
+
     override _.View model dispatch =
         let KW = int model.W
         let KH_w = 120
@@ -60,6 +62,10 @@ type Keyboard()=
             height: {KH_b}px; 
             border-radius: 0px 0px 3px 3px;"
 
+        let noteNames = getNoteNames model.Language
+        let lastNote = Array.last noteNames
+        printfn "notes: %A" noteNames
+
         div[ 
             attr.id "keyboard" 
             attr.style style1 
@@ -67,12 +73,12 @@ type Keyboard()=
             ul [
                 attr.style style1
             ] [
-                forEach noteNames_german <| fun c ->
+                forEach noteNames <| fun c ->
                     li [
                         attr.id c 
                         attr.title c 
                         "data-note-type" => "white" 
-                        attr.style <| style_w (c="H")
+                        attr.style <| style_w (c = lastNote)
                         on.click (fun _ -> NextGuess(c) |> dispatch)
                     ] []
                     

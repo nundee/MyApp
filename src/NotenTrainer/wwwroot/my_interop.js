@@ -1,15 +1,12 @@
 ﻿window.MyJsLib = {
-    focus: function (elt) {
-        console.log("try focus ", elt)
-        elt.focus();
+    saveSettings: function(s) {
+        console.log("save settings", s)
+        localStorage.setItem("NotenTrainerSettings", s);
     },
 
-    unfocus: function (elt) {
-        console.log("try unfocus ", elt)
-        elt.blur();
+    loadSettings: function() {
+        console.log("load settings")
+        const s = localStorage.getItem("NotenTrainerSettings")
+        return s == undefined || s == null ? "" : s
     },
-
-    newPlot: function (id, traces = [], layout = {}) {
-        Plotly.newPlot(id, traces, layout);
-    }
 };

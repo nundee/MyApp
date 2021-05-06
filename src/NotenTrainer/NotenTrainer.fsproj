@@ -1,21 +1,21 @@
-﻿<?xml version="1.0" encoding="utf-8"?>
+<?xml version="1.0" encoding="utf-8"?>
 <Project Sdk="Microsoft.NET.Sdk.BlazorWebAssembly">
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="Model.fs" />
-    <Compile Include="Language.fs" />
-    <Compile Include="Partitur.fs" />
-    <Compile Include="Keyboard.fs" />
-    <Compile Include="Stats.fs" />
-    <Compile Include="my_interop.fs" />
-    <Compile Include="Main.fs" />
-    <Compile Include="Startup.fs" />
+    <Compile Include="my_interop.fs"/>
+    <Compile Include="Language.fs"/>
+    <Compile Include="Model.fs"/>
+    <Compile Include="Partitur.fs"/>
+    <Compile Include="Keyboard.fs"/>
+    <Compile Include="Stats.fs"/>
+    <Compile Include="Main.fs"/>
+    <Compile Include="Startup.fs"/>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Bolero" Version="0.*" />
-    <PackageReference Include="Bolero.Build" Version="0.*" />
-    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="5.0.*" />
+    <PackageReference Include="Bolero" Version="0.17.25"/>
+    <PackageReference Include="Bolero.Build" Version="0.17.25"/>
+    <PackageReference Include="Microsoft.AspNetCore.Components.WebAssembly.DevServer" Version="5.0.5"/>
   </ItemGroup>
 </Project>

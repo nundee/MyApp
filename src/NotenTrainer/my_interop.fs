@@ -1,7 +1,7 @@
 module MyInterop
 
 open Microsoft.JSInterop
-
+open System.Text.Json
 type JS() =    
     static member val Runtime = Unchecked.defaultof<IJSRuntime>  with get, set
     static member log([<System.ParamArray>] args:obj[]) =
@@ -10,11 +10,16 @@ type JS() =
         JS.Runtime.InvokeVoidAsync(func, args).AsTask()
         // |> Run
     static member evalFunc(func:string, [<System.ParamArray>] args:obj[])=
-        let x = JS.Runtime.InvokeAsync(func, args).AsTask() |> Async.AwaitTask
+        let x = JS.Runtime.InvokeAsync(func, args).AsTask()
         x
 
 
-let inline setFocus (elt:Bolero.HtmlRef) =
-    JS.execFunc("MyJsLib.focus",elt.Value)
-let inline unsetFocus (elt:Bolero.HtmlRef) =
-        JS.execFunc("MyJsLib.unfocus",elt.Value)
+let saveSettings<'T> s =
+    JS.execFunc("MyJsLib.saveSettings", JsonSerializer.Serialize<'T>(s)) 
+
+let loadSettings<'T> fallback =
+    async {
+        let! ss = JS.evalFunc<string>("MyJsLib.loadSettings") |> Async.AwaitTask
+        if ss.Length<1 then return fallback else
+        return JsonSerializer.Deserialize<'T>(ss)
+    }
