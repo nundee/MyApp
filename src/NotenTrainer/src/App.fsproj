@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="interop.fs" />
+    <Compile Include="Language.fs" />
+    <Compile Include="Model.fs" />
+    <Compile Include="Partitur.fs" />
+    <Compile Include="Keyboard.fs" />
+    <Compile Include="Stats.fs" />
+    <Compile Include="Main.fs" />
+    <Compile Include="App.fs" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="Fable.Browser.Dom" Version="*" />
+    <PackageReference Include="Fable.Core" Version="3.2.3" />
+    <PackageReference Include="Fable.Elmish" Version="*" />
+    <PackageReference Include="Fable.Elmish.React" Version="*" />
+  </ItemGroup>
+</Project>

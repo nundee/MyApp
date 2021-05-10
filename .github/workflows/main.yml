@@ -30,22 +30,33 @@ jobs:
         uses: actions/setup-dotnet@v1
         with:
             dotnet-version: '5.0.x'
+      # sets up node.js
+      - name: Setup node.js
+        uses: actions/setup-node@v2
+        with:
+            node-version: '15'
+
+      - name: install packages
+        run:  npm install
+        working-directory: src/NotenTrainer
+      - name: build .net assembly
+        run:  dotnet build src/NotenTrainer/src/App.fsproj
 
       # publish
       - name: Publish the project
-        run: dotnet publish src/NotenTrainer/NotenTrainer.fsproj -c Release -o release/NotenTrainer --nologo
+        run: npm run build
+        working-directory: src/NotenTrainer
 
       # changes the base-tag in index.html from '/' to 'MyApp' to match GitHub Pages repository subdirectory
       - name: Change base-tag in index.html from / to MyApp
-        run: sed -i 's/<base href="\/" \/>/<base href="\/MyApp\/" \/>/g' release/NotenTrainer/wwwroot/index.html
+        run: sed -i 's/base href="\/"/base href="\/MyApp\/"/g' src/NotenTrainer/public/index.html
       # add .nojekyll file to tell GitHub pages to not treat this as a Jekyll project. (Allow files and folders starting with an underscore)
       - name: Add .nojekyll file
-        run: touch release/NotenTrainer/wwwroot/.nojekyll
+        run: touch src/NotenTrainer/public/.nojekyll
 
-      - name: Commit wwwroot to GitHub Pages
+      - name: Commit public to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@3.7.1
         with:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
             BRANCH: gh-pages
-            FOLDER: release/NotenTrainer/wwwroot
-
+            FOLDER: src/NotenTrainer/public

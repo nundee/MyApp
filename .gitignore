@@ -4,3 +4,4 @@ src/**/bin
 src/**/obj
 *.user
 .fake
+src/**/node_modules
