@@ -16,5 +16,15 @@
     </div>
     <script src="bundle.js"></script>
 </body>
+<script>
+    document.addEventListener("DOMContentLoaded", function(event) {
+        console.log("DOM fully loaded and parsed");
+        document.addEventListener('dblclick', function(event) {
+            console.log("double click disabled!");
+            event.preventDefault();
+            event.stopPropagation();
+        }, true);
+    });
+</script>
 
 </html>

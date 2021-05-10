@@ -35,20 +35,9 @@ let view model dispatch =
         let right_border_width = if is_last then 1 else 0
         let right_border_style = if is_last then "solid" else "initial"
         let right_border_color = if is_last then "rgb(0, 0, 0)" else "initial"
-        CSSProp.Display DisplayOptions.InlineBlock
-        CSSProp.Cursor  "pointer"
-        CSSProp.Custom("userSelect","none")
-        CSSProp.BackgroundColor "rgb(255, 255, 255)"
         CSSProp.BorderWidth $"1px {right_border_width}px 1px 1px" 
-        CSSProp.BorderTopStyle "solid"
         CSSProp.BorderRightStyle $"{right_border_style}" 
-        CSSProp.BorderBottomStyle "solid"
-        CSSProp.BorderLeftStyle "solid" 
-        CSSProp.BorderTopColor "rgb(0, 0, 0)"
         CSSProp.BorderRightColor $"{right_border_color}" 
-        CSSProp.BorderBottomColor "rgb(0, 0, 0)"
-        CSSProp.BorderLeftColor "rgb(0, 0, 0)" 
-        CSSProp.BorderImage "initial" 
         CSSProp.Height $"{KH_w}px" 
         CSSProp.Width $"{KW_w}px" 
         CSSProp.BorderRadius "0px 0px 5px 5px" 
@@ -56,15 +45,9 @@ let view model dispatch =
 
 
     let style_b (left_pos:int) = [
-        CSSProp.Display DisplayOptions.InlineBlock
-        CSSProp.Custom("userSelect","none") 
-        CSSProp.BackgroundColor "rgb(0, 0, 0)" 
-        CSSProp.Border "1px solid rgb(0, 0, 0)" 
-        CSSProp.Position PositionOptions.Absolute 
         CSSProp.Left $"{left_pos}px" 
         CSSProp.Width $"{KW_b}px" 
         CSSProp.Height $"{KH_b}px" 
-        CSSProp.BorderRadius "0px 0px 3px 3px"
     ]
 
     let noteNames = getNoteNames model.Language
@@ -74,15 +57,19 @@ let view model dispatch =
     div [Id "keyboard"; Style style1] [
         ul [Style style1] [
             for c in noteNames do
-                li [
-                    Id c 
-                    Title c 
-                    Style <| style_w (c = lastNote)
-                    OnClick (fun _ -> NextGuess(c) |> dispatch)
-                ] []
+                li [Style [CSSProp.Display DisplayOptions.InlineBlock]][
+                    button [
+                        Class "kbwhite" 
+                        Id c 
+                        Title c 
+                        Style <| style_w (c = lastNote)
+                        OnClick (fun _ -> NextGuess(c) |> dispatch)
+                    ][]
+                ]
                 
             for (c,i) in [("C#",1);("D#",2); ("F#",4); ("G#",5); ("A#",6)] do
                 li [
+                    Class "kbblack"
                     Id c 
                     Title c 
                     Style <| style_b ((KW_w+1)*i - KW_b/2)
