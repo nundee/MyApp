@@ -3,8 +3,8 @@
     <TargetFramework>netstandard2.0</TargetFramework>
   </PropertyGroup>
   <ItemGroup>
-    <Compile Include="interop.fs" />
     <Compile Include="Language.fs" />
+    <Compile Include="interop.fs" />
     <Compile Include="Model.fs" />
     <Compile Include="Partitur.fs" />
     <Compile Include="Keyboard.fs" />

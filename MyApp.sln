@@ -7,7 +7,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{87F6C079-CBD
 EndProject
 Project("{6EC3EE1D-3C4E-46DD-8F32-0CC8E7565705}") = "MyApp.Client", "src\MyApp.Client\MyApp.Client.fsproj", "{1481BBD6-A6DA-4912-A03A-134880D14701}"
 EndProject
-Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "NotenTrainer", "src\NotenTrainer\NotenTrainer.fsproj", "{D2307321-C015-4DB5-B9D8-4BB2047F70AA}"
+Project("{F2A71F9B-5D33-465A-A702-920D77279786}") = "NotenTrainer", "src\NotenTrainer\src\App.fsproj", "{D2307321-C015-4DB5-B9D8-4BB2047F70AA}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

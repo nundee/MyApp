@@ -15,6 +15,7 @@ type Model =
         Language : string
 
         StartTime : DateTime
+        LastGuessTime : DateTime
         CurrentKey : EKey
         Current : (int*int)[]
         Guess :   int list
@@ -67,6 +68,7 @@ let initModel () =
         Language = settings.Language
 
         StartTime = now
+        LastGuessTime = now
         CurrentKey = nextKey()
         Current = nextNotes settings.NrNotes
         Guess = []
@@ -92,6 +94,9 @@ let inline gameOver model =
 let inline guessCompleted model = 
     model.Guess.Length = model.Current.Length
 
+let inline elapsedTime (model:Model)=
+    (model.LastGuessTime-model.StartTime).TotalSeconds
+
 open NotenTrainer.Lang
 
 let rec update (message:Message) (model:Model) =
@@ -102,11 +107,12 @@ let rec update (message:Message) (model:Model) =
             CurrentKey = nextKey()
             Current = nextNotes settings.NrNotes
             Guess = []
+            LastGuessTime=DateTime.Now 
         }
     | NextGuess(c) ->
         if gameOver model then model else
         let i = getNoteNames model.Language |> Array.findIndex ((=) c)
-        let newModel = { model with Guess = i::model.Guess }
+        let newModel = { model with Guess = i::model.Guess; LastGuessTime=DateTime.Now }
         if newModel |> guessCompleted then newModel |> checkGuess |> update NextTest
         else newModel
     | ChangeLanguage(lang) -> 

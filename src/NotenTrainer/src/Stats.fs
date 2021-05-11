@@ -19,7 +19,7 @@ let view (model:Model) dispatch =
         let first_item = li [] [str $"{msg EStatMsg.IterLeft} {model.MaxIter - model.Iter}"]
         if (model.Iter<1) then [first_item] else
         [
-            li [] [str $"{msg EStatMsg.ElapsedTime}: {(DateTime.Now-model.StartTime).Seconds}s"]
+            li [] [str $"{msg EStatMsg.ElapsedTime}: {elapsedTime model}s"]
             first_item
             li [] [str $"{msg EStatMsg.Correct} {System.Math.Round((float model.NrCorrect)/(float model.Iter)*100.0,1)} %%"]
             li [ Style [CSSProp.Color (if model.LastGuess then "green" else "red")] ] [
