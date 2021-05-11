@@ -3,8 +3,7 @@
     "scripts": {
         "postinstall": "dotnet tool restore",
         "start": "dotnet fable watch src --run webpack serve",
-        "build": "dotnet fable src --run webpack --mode production",
-        "build-github": "dotnet fable src --run webpack --mode production && cp -f ./public/index.html.github ./public/index.html"
+        "build": "dotnet fable src --run webpack --mode production"
     },
     "devDependencies": {
         "react": "^17.0.2",

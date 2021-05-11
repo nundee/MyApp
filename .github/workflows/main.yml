@@ -44,12 +44,12 @@ jobs:
 
       # publish
       - name: Publish the project
-        run: npm run build-github
+        run: npm run build
         working-directory: ./src/NotenTrainer
 
       # changes the base-tag in index.html from '/' to 'MyApp' to match GitHub Pages repository subdirectory
-      #- name: Change base-tag in index.html from / to MyApp
-      #  run: rm ./src/NotenTrainer/public/index.html && mv ./src/NotenTrainer/public/index.html.github ./src/NotenTrainer/public/index.html
+      - name: Change base-tag in index.html from / to MyApp
+        run: sed -i 's/base href="\/"/base href="\/MyApp\/"/g' src/NotenTrainer/public/index.html
 
       # add .nojekyll file to tell GitHub pages to not treat this as a Jekyll project. (Allow files and folders starting with an underscore)
       - name: Add .nojekyll file
@@ -61,3 +61,4 @@ jobs:
             GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
             BRANCH: gh-pages
             FOLDER: src/NotenTrainer/public
+            PRESERVE: true
